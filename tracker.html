@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Order — The Daily Drip</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="/" class="navbar-logo">
+    <div class="logo-cup">☕</div>
+    <span class="logo-name">The Daily Drip</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/menu.html">Menu</a></li>
+    <li><a href="/tracker.html" class="active">Track Order</a></li>
+  </ul>
+  <a href="/checkout.html" class="navbar-cart">
+    <span>🛒</span><span>Cart</span>
+    <span class="cart-badge hidden">0</span>
+  </a>
+</nav>
+
+<!-- ── Page Header ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="page-header-inner container">
+    <span class="eyebrow">📡 Live Updates</span>
+    <h1>Track Your Order</h1>
+  </div>
+</div>
+
+<!-- ── Body ─────────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+
+    <!-- Lookup Form -->
+    <div id="lookup-view">
+      <div class="tracker-lookup">
+        <div class="lookup-icon">🔍</div>
+        <h2>Find Your Order</h2>
+        <p>Enter your order ID below to see its live status.</p>
+        <div class="lookup-row">
+          <input type="text" id="lookup-input" placeholder="e.g. DD123456" onkeydown="if(event.key==='Enter')lookupOrder()" />
+          <button class="btn btn-primary" onclick="lookupOrder()">Track →</button>
+        </div>
+        <p id="lookup-error" style="color:#c0392b; font-size:.84rem; margin-top:12px; display:none;">
+          ⚠ Order not found. Please check your order ID.
+        </p>
+      </div>
+    </div>
+
+    <!-- Tracker View -->
+    <div id="tracker-view" style="display:none">
+      <div class="tracker-card">
+
+        <!-- Header row -->
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:32px;">
+          <div>
+            <div style="font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;">Order ID</div>
+            <div class="tracker-order-id" id="display-order-id">—</div>
+            <div class="tracker-for" id="display-customer">—</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="status-badge" id="status-badge">—</div>
+            <div style="font-size:.76rem; color:var(--text-muted); margin-top:8px;" id="display-time"></div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="status-track">
+          <div class="status-step" id="step-received">
+            <div class="step-circle">📋</div>
+            <div class="step-label">Order<br/>Received</div>
+          </div>
+          <div class="status-step" id="step-preparing">
+            <div class="step-circle">👨‍🍳</div>
+            <div class="step-label">Being<br/>Prepared</div>
+          </div>
+          <div class="status-step" id="step-ready">
+            <div class="step-circle">✅</div>
+            <div class="step-label">Ready for<br/>Pickup</div>
+          </div>
+          <div class="status-step" id="step-completed">
+            <div class="step-circle">🎉</div>
+            <div class="step-label">Completed</div>
+          </div>
+        </div>
+
+        <!-- Status message -->
+        <div class="status-msg" id="status-msg">—</div>
+
+        <!-- Order items -->
+        <h3 style="font-family:'Playfair Display',serif; margin-bottom:16px; font-size:1.1rem;">Items in this Order</h3>
+        <div id="tracker-order-items"></div>
+
+        <hr class="divider" />
+
+        <!-- Footer row -->
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+          <div>
+            <div style="font-size:.76rem; color:var(--text-muted); margin-bottom:4px;">Order Total (incl. tax)</div>
+            <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--brown-700);" id="display-total">—</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/menu.html" class="btn btn-outline">+ New Order</a>
+            <button class="btn btn-primary" onclick="resetTracker()">Track Another</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span>☕</span>
+      <span class="script">The Daily Drip</span>
+      <span style="margin-left:8px">· 123 Maple Street · © 2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a><a href="/menu.html">Menu</a><a href="/tracker.html">Track Order</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/cart.js"></script>
+<script>
+let pollInterval = null;
+let currentOrderId = null;
+
+const SEQ    = ['received','preparing','ready','completed'];
+const MSGS   = {
+  received:  '📋 We\'ve received your order and it\'ll be started shortly!',
+  preparing: '👨‍🍳 Your order is being lovingly prepared — won\'t be long!',
+  ready:     '✅ Your order is ready for pickup! Come on over.',
+  completed: '🎉 Enjoy! Thanks for choosing The Daily Drip — see you soon.',
+};
+const BADGE_CLASS = { received:'received', preparing:'preparing', ready:'ready', completed:'completed' };
+const BADGE_LABEL = { received:'Order Received', preparing:'Preparing', ready:'Ready for Pickup', completed:'Completed' };
+
+window.addEventListener('DOMContentLoaded', () => {
+  const id = new URLSearchParams(window.location.search).get('order');
+  if (id) loadOrder(id.toUpperCase());
+});
+
+function lookupOrder() {
+  const val = document.getElementById('lookup-input').value.trim().toUpperCase();
+  if (val) loadOrder(val);
+}
+
+async function loadOrder(id) {
+  document.getElementById('lookup-error').style.display = 'none';
+  try {
+    const res = await fetch(`/api/orders/${id}`);
+    if (!res.ok) { document.getElementById('lookup-error').style.display = 'block'; return; }
+    currentOrderId = id;
+    renderOrder(await res.json());
+    startPolling();
+    document.getElementById('lookup-view').style.display  = 'none';
+    document.getElementById('tracker-view').style.display = 'block';
+  } catch {
+    document.getElementById('lookup-error').style.display = 'block';
+  }
+}
+
+function renderOrder(order) {
+  document.getElementById('display-order-id').textContent = order.order_id;
+  document.getElementById('display-customer').textContent = `For ${order.customer_name}`;
+  document.getElementById('display-total').textContent = `$${(order.total * 1.08).toFixed(2)}`;
+  document.getElementById('display-time').textContent = new Date(order.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  const badge = document.getElementById('status-badge');
+  badge.textContent = BADGE_LABEL[order.status] || order.status;
+  badge.className = `status-badge ${BADGE_CLASS[order.status] || ''}`;
+
+  document.getElementById('status-msg').textContent = MSGS[order.status] || '';
+
+  const idx = SEQ.indexOf(order.status);
+  SEQ.forEach((s, i) => {
+    const step = document.getElementById(`step-${s}`);
+    step.classList.remove('done','active');
+    if (i < idx) step.classList.add('done');
+    else if (i === idx) step.classList.add('active');
+  });
+
+  document.getElementById('tracker-order-items').innerHTML = (order.items || []).map(it => `
+    <div class="order-line">
+      <div class="order-line-info">
+        <div class="name">${it.item_name}</div>
+        <div class="sub">Qty: ${it.quantity}</div>
+      </div>
+      <div class="order-line-price">$${(it.price * it.quantity).toFixed(2)}</div>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted);font-size:.88rem;">No items found.</p>';
+}
+
+function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(async () => {
+    if (!currentOrderId) return;
+    try {
+      const res = await fetch(`/api/orders/${currentOrderId}`);
+      if (res.ok) {
+        const order = await res.json();
+        renderOrder(order);
+        if (order.status === 'completed') stopPolling();
+      }
+    } catch {}
+  }, 3000);
+}
+function stopPolling() { if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } }
+
+function resetTracker() {
+  stopPolling(); currentOrderId = null;
+  document.getElementById('lookup-input').value = '';
+  document.getElementById('lookup-error').style.display = 'none';
+  document.getElementById('tracker-view').style.display = 'none';
+  document.getElementById('lookup-view').style.display  = 'block';
+  history.replaceState({}, '', '/tracker.html');
+}
+</script>
+</body>
+</html>

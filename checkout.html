@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — The Daily Drip</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="/" class="navbar-logo">
+    <div class="logo-cup">☕</div>
+    <span class="logo-name">The Daily Drip</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/menu.html">Menu</a></li>
+    <li><a href="/tracker.html">Track Order</a></li>
+  </ul>
+  <a href="/checkout.html" class="navbar-cart">
+    <span>🛒</span><span>Cart</span>
+    <span class="cart-badge hidden">0</span>
+  </a>
+</nav>
+
+<!-- ── Page Header ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="page-header-inner container">
+    <span class="eyebrow">Almost there ✦</span>
+    <h1>Checkout</h1>
+  </div>
+</div>
+
+<!-- ── Body ─────────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+
+    <!-- Empty state -->
+    <div id="empty-state" style="display:none">
+      <div style="text-align:center; padding:80px 20px;">
+        <div style="font-size:3.5rem; margin-bottom:20px; opacity:.5">🛒</div>
+        <h3 style="margin-bottom:12px; font-family:'Playfair Display',serif;">Your cart is empty</h3>
+        <p style="color:var(--text-soft); margin-bottom:28px;">Add some items from the menu first!</p>
+        <a href="/menu.html" class="btn btn-primary btn-lg">Browse Menu →</a>
+      </div>
+    </div>
+
+    <!-- Checkout layout -->
+    <div class="checkout-layout" id="checkout-content">
+
+      <!-- Left: form -->
+      <div>
+        <div class="checkout-panel">
+          <h3 class="panel-title"><span class="icon">👤</span> Your Details</h3>
+          <form id="checkout-form" onsubmit="placeOrder(event)">
+            <div class="form-group">
+              <label for="cname">Your Name *</label>
+              <input type="text" id="cname" placeholder="e.g. Yasmine" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="cnote">
+                Special Requests
+                <span style="font-weight:400; color:var(--text-muted)"> — optional</span>
+              </label>
+              <textarea id="cnote" placeholder="e.g. Oat milk, extra shot, no sugar, allergen info…"></textarea>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Pickup note -->
+            <div style="background:var(--gold-pale); border:1px solid rgba(201,146,42,.25); border-radius:var(--r); padding:14px 16px; margin-bottom:20px; display:flex; gap:12px; align-items:flex-start;">
+              <span style="font-size:1.2rem; flex-shrink:0">⏱</span>
+              <div>
+                <div style="font-size:.84rem; font-weight:600; color:var(--brown-700); margin-bottom:2px;">Ready in ~5–10 minutes</div>
+                <div style="font-size:.8rem; color:var(--text-soft);">We'll start preparing your order as soon as it's placed. You'll get a live tracker link.</div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold btn-lg btn-full" id="place-btn">
+              ☕ Place Order
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right: summary -->
+      <div>
+        <div class="checkout-panel">
+          <h3 class="panel-title"><span class="icon">🧾</span> Order Summary</h3>
+          <div id="order-lines"></div>
+          <hr class="divider" />
+          <div id="summary-totals"></div>
+          <div style="margin-top:16px;">
+            <a href="/menu.html" class="btn btn-outline btn-sm btn-full">+ Add More Items</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span>☕</span>
+      <span class="script">The Daily Drip</span>
+      <span style="margin-left:8px">· 123 Maple Street · © 2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a><a href="/menu.html">Menu</a><a href="/tracker.html">Track Order</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/cart.js"></script>
+<script>
+function renderSummary() {
+  const items   = Cart.getItems();
+  const empty   = document.getElementById('empty-state');
+  const content = document.getElementById('checkout-content');
+  if (!items.length) { empty.style.display='block'; content.style.display='none'; return; }
+  empty.style.display='none'; content.style.display='grid';
+
+  document.getElementById('order-lines').innerHTML = items.map(it => `
+    <div class="order-line">
+      <div class="order-line-emoji">${it.emoji}</div>
+      <div class="order-line-info">
+        <div class="name">${it.name}</div>
+        <div class="sub">× ${it.quantity} &nbsp;@&nbsp; $${it.price.toFixed(2)} each</div>
+      </div>
+      <div class="order-line-price">$${(it.price * it.quantity).toFixed(2)}</div>
+    </div>
+  `).join('');
+
+  const sub = Cart.getSubtotal();
+  const tax = sub * .08;
+  document.getElementById('summary-totals').innerHTML = `
+    <div class="summary-row"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="summary-row"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+    <div class="summary-row grand"><span>Total</span><span>$${(sub+tax).toFixed(2)}</span></div>
+  `;
+}
+
+async function placeOrder(e) {
+  e.preventDefault();
+  const name  = document.getElementById('cname').value.trim();
+  const note  = document.getElementById('cnote').value.trim();
+  const items = Cart.getItems();
+  if (!name || !items.length) return;
+
+  const btn = document.getElementById('place-btn');
+  btn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block">⏳</span> Placing order…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_name: name, customer_note: note, items: items.map(i => ({ id: i.id, quantity: i.quantity })) })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    Cart.clear();
+    window.location.href = `/tracker.html?order=${data.order_id}`;
+  } catch {
+    showToast('Something went wrong. Please try again.', 'error');
+    btn.innerHTML = '☕ Place Order';
+    btn.disabled = false;
+  }
+}
+
+renderSummary();
+</script>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</body>
+</html>

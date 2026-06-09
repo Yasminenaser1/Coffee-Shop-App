@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Daily Drip — Artisan Coffee</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    /* Steam animation for SVG cup */
+    .steam-line { stroke:rgba(255,255,255,.45); stroke-width:3; fill:none; stroke-linecap:round; }
+    @keyframes steam1 { 0%,100%{opacity:.45;transform:translateY(0) scaleX(1)} 50%{opacity:0;transform:translateY(-22px) scaleX(1.6)} }
+    @keyframes steam2 { 0%,100%{opacity:.35;transform:translateY(0) scaleX(1)} 50%{opacity:0;transform:translateY(-28px) scaleX(1.4)} }
+    @keyframes steam3 { 0%,100%{opacity:.4;transform:translateY(0) scaleX(1)} 50%{opacity:0;transform:translateY(-20px) scaleX(1.5)} }
+    .s1 { animation:steam1 2.8s ease-in-out infinite; transform-origin:center bottom; }
+    .s2 { animation:steam2 2.8s ease-in-out .7s infinite; transform-origin:center bottom; }
+    .s3 { animation:steam3 2.8s ease-in-out 1.4s infinite; transform-origin:center bottom; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="/" class="navbar-logo">
+    <div class="logo-cup">☕</div>
+    <span class="logo-name">The Daily Drip</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="/" class="active">Home</a></li>
+    <li><a href="/menu.html">Menu</a></li>
+    <li><a href="/tracker.html">Track Order</a></li>
+  </ul>
+  <a href="/checkout.html" class="navbar-cart">
+    <span>🛒</span><span>Cart</span>
+    <span class="cart-badge hidden">0</span>
+  </a>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-fade"></div>
+
+  <!-- Left: text -->
+  <div class="hero-content">
+    <div class="hero-pill">
+      <span class="dot"></span>
+      Open today · 7am – 8pm
+    </div>
+
+    <h1>Where every cup<br/>tells a <em>story.</em></h1>
+
+    <p class="hero-sub">Handcrafted espresso, single-origin cold brews, and freshly baked pastries — made with care, served with soul.</p>
+
+    <div class="hero-ctas">
+      <a href="/menu.html" class="btn btn-amber btn-lg">Browse Menu →</a>
+      <a href="/tracker.html" class="btn btn-outline btn-lg">Track Order</a>
+    </div>
+
+    <div class="hero-proof">
+      <span class="hero-stars">★★★★★</span>
+      <p><strong>4.9</strong> · Loved by <strong>2,400+</strong> regulars</p>
+    </div>
+  </div>
+
+  <!-- Right: illustrated coffee cup -->
+  <div class="hero-visual">
+    <div class="cup-scene">
+      <div class="cup-glow"></div>
+
+      <!-- Floating badge: today's special -->
+      <div class="hero-badge badge-tl">
+        <div class="badge-label">Today's Special</div>
+        <div class="badge-value">Iced Caramel Macchiato</div>
+        <div class="badge-sub">$6.25 · Made fresh</div>
+      </div>
+
+      <!-- Floating badge: rating -->
+      <div class="hero-badge badge-br">
+        <div class="badge-label">Customer Rating</div>
+        <div class="badge-value" style="font-size:1.3rem; color:var(--amber-lt)">★★★★★</div>
+        <div class="badge-sub">800+ reviews</div>
+      </div>
+
+      <!-- Mini badge -->
+      <div class="hero-badge badge-tr" style="text-align:center">
+        <div style="font-size:1.4rem">🌿</div>
+        <div style="font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:4px;">Oat Milk</div>
+      </div>
+
+      <!-- SVG Coffee Cup Illustration -->
+      <div class="cup-svg-wrap">
+        <svg width="220" height="260" viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Steam wisps -->
+          <g class="s1">
+            <path class="steam-line" d="M72 72 Q65 56 74 40 Q82 26 74 12"/>
+          </g>
+          <g class="s2">
+            <path class="steam-line" d="M110 65 Q103 46 112 28 Q120 12 110 -2"/>
+          </g>
+          <g class="s3">
+            <path class="steam-line" d="M148 72 Q155 56 146 40 Q138 26 146 12"/>
+          </g>
+
+          <!-- Saucer shadow -->
+          <ellipse cx="110" cy="240" rx="80" ry="9" fill="rgba(0,0,0,0.18)"/>
+
+          <!-- Saucer -->
+          <ellipse cx="110" cy="232" rx="76" ry="11" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <ellipse cx="110" cy="229" rx="55" ry="7" fill="rgba(255,255,255,0.07)"/>
+
+          <!-- Cup body (tapered) -->
+          <path d="M38 92 Q34 215 110 215 Q186 215 182 92 Z"
+                fill="rgba(255,255,255,0.11)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+
+          <!-- Cup body inner highlight (left side shine) -->
+          <path d="M46 110 Q43 175 62 200"
+                fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="10" stroke-linecap="round"/>
+
+          <!-- Handle -->
+          <path d="M182 125 Q216 125 216 158 Q216 191 182 191"
+                fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="13" stroke-linecap="round"/>
+          <!-- Handle inner -->
+          <path d="M182 138 Q204 138 204 158 Q204 178 182 178"
+                fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="6" stroke-linecap="round"/>
+
+          <!-- Coffee surface (dark espresso) -->
+          <ellipse cx="110" cy="92" rx="72" ry="17" fill="#4A1C06"/>
+
+          <!-- Latte art — simple rosette heart -->
+          <path d="M94 87 Q94 79 102 79 Q110 79 110 87 Q110 79 118 79 Q126 79 126 87 Q126 95 110 104 Q94 95 94 87 Z"
+                fill="rgba(215,158,72,0.55)"/>
+          <!-- Center stem -->
+          <line x1="110" y1="87" x2="110" y2="104" stroke="rgba(215,158,72,0.4)" stroke-width="1.5"/>
+          <!-- Arcs -->
+          <path d="M97 91 Q103 88 110 88 Q117 88 123 91"
+                fill="none" stroke="rgba(215,158,72,0.35)" stroke-width="1"/>
+
+          <!-- Cup rim (ellipse) -->
+          <ellipse cx="110" cy="92" rx="72" ry="17"
+                   fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>
+          <!-- Rim top highlight -->
+          <path d="M56 88 Q110 78 164 88"
+                fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3" stroke-linecap="round"/>
+
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">✦ Why we're different</span>
+      <h2>Crafted with intention.</h2>
+      <p>From bean to cup, every step is deliberate.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🫘</div>
+        <h4>Single-Origin Beans</h4>
+        <p>Sourced directly from farms in Ethiopia, Colombia, and Guatemala. Traceable, seasonal, and exceptional.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👨‍🍳</div>
+        <h4>Expert Baristas</h4>
+        <p>Every pour is intentional. Our team trains obsessively — because your cup deserves nothing less.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌿</div>
+        <h4>Dietary Options</h4>
+        <p>Oat, almond, soy, and whole milk. Gluten-free and vegan pastry options available every day.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h4>Order & Track Live</h4>
+        <p>Order online and watch your order move from prep to pickup in real time. No waiting, no guessing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Featured Items ───────────────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">★ Customer Favorites</span>
+      <h2>Today's Top Picks</h2>
+      <p>Our most-loved items, every single day.</p>
+    </div>
+    <div class="featured-grid" id="featured-grid"><!-- JS --></div>
+    <div style="text-align:center; margin-top:44px;">
+      <a href="/menu.html" class="btn btn-primary btn-lg">View All 32+ Items →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── About Strip ──────────────────────────────────────────────────────── -->
+<section class="about-strip">
+  <div class="about-inner">
+    <span class="eyebrow" style="color:var(--amber-lt)">✦ Our story</span>
+    <h2>Not just a coffee shop.<br/>A daily ritual.</h2>
+    <p>The Daily Drip was born from a belief that great coffee can transform an ordinary morning into something worth remembering. Every bean is sourced with care, every pastry baked before sunrise.</p>
+    <div class="about-ctas">
+      <a href="/menu.html" class="btn btn-amber">Explore Our Menu</a>
+      <a href="/tracker.html" class="btn btn-outline">Track an Order</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">32+</div><div class="stat-label">Menu Items</div></div>
+      <div class="stat"><div class="stat-num">7am</div><div class="stat-label">First Brew</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Fresh Daily</div></div>
+      <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">Rating</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span>☕</span>
+      <span class="script">The Daily Drip</span>
+      <span style="margin-left:8px">· 123 Maple Street · © 2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/menu.html">Menu</a>
+      <a href="/tracker.html">Track Order</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/cart.js"></script>
+<script>
+const FEATURED_IDS = [3, 9, 19, 29];
+const GRAD = {
+  'hot-drinks':  'linear-gradient(150deg,#1A0600 0%,#7A3010 100%)',
+  'iced-drinks': 'linear-gradient(150deg,#081830 0%,#1A5080 100%)',
+  'tea':         'linear-gradient(150deg,#081A10 0%,#185830 100%)',
+  'pastries':    'linear-gradient(150deg,#2A1004 0%,#8A5010 100%)',
+  'sandwiches':  'linear-gradient(150deg,#1A1008 0%,#6A4018 100%)',
+  'sweets':      'linear-gradient(150deg,#1A0818 0%,#681848 100%)',
+};
+const CLABEL = { 'hot-drinks':'Hot','iced-drinks':'Iced','tea':'Tea','pastries':'Pastry','sandwiches':'Sandwich','sweets':'Sweet' };
+
+async function loadFeatured() {
+  const res = await fetch('/api/menu');
+  const all = await res.json();
+  let picks = all.filter(i => FEATURED_IDS.includes(i.id));
+  const extra = all.filter(i => !FEATURED_IDS.includes(i.id));
+  while (picks.length < 4 && extra.length) picks.push(extra.shift());
+
+  document.getElementById('featured-grid').innerHTML = picks.slice(0,4).map(i => card(i)).join('');
+}
+
+function card(i) {
+  return `
+  <div class="item-card">
+    <div class="item-visual" style="background:${GRAD[i.category] || GRAD.sweets}">
+      <div class="item-cat-tag">${CLABEL[i.category] || i.category}</div>
+      <div class="item-emoji-wrap">
+        <div class="item-ring-outer"></div>
+        <div class="item-ring-inner"></div>
+        <span class="item-emoji">${i.emoji}</span>
+      </div>
+    </div>
+    <div class="item-body">
+      <h4>${i.name}</h4>
+      <p class="item-desc">${i.description}</p>
+      <div class="item-foot">
+        <span class="item-price">$${i.price.toFixed(2)}</span>
+        <button class="btn-add" onclick="addCart(${i.id},'${esc(i.name)}',${i.price},'${i.emoji}',this)">+ Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function esc(s) { return s.replace(/'/g,"\\'"); }
+function addCart(id, name, price, emoji, btn) {
+  Cart.add({id, name, price, emoji});
+  showToast(`${emoji} ${name} added to cart!`);
+  btn.textContent = '✓ Added'; btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ Add'; btn.classList.remove('added'); }, 1800);
+}
+
+loadFeatured();
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu — The Daily Drip</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="/" class="navbar-logo">
+    <div class="logo-cup">☕</div>
+    <span class="logo-name">The Daily Drip</span>
+  </a>
+  <ul class="navbar-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/menu.html" class="active">Menu</a></li>
+    <li><a href="/tracker.html">Track Order</a></li>
+  </ul>
+  <button class="navbar-cart" onclick="openCart()">
+    <span>🛒</span>
+    <span>Cart</span>
+    <span class="cart-badge hidden">0</span>
+  </button>
+</nav>
+
+<!-- ── Page Header ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="page-header-inner container">
+    <span class="eyebrow">☕ Fresh every day</span>
+    <h1>Our Menu</h1>
+  </div>
+</div>
+
+<!-- ── Menu ─────────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+
+    <!-- Category Tabs -->
+    <div class="category-tabs" id="cat-tabs">
+      <button class="tab-btn active" data-cat="all" onclick="filterCat('all',this)">
+        🍽 All <span class="tab-count" id="count-all">0</span>
+      </button>
+      <button class="tab-btn" data-cat="hot-drinks" onclick="filterCat('hot-drinks',this)">
+        ☕ Hot Drinks <span class="tab-count" id="count-hot">0</span>
+      </button>
+      <button class="tab-btn" data-cat="iced-drinks" onclick="filterCat('iced-drinks',this)">
+        🧊 Iced <span class="tab-count" id="count-iced">0</span>
+      </button>
+      <button class="tab-btn" data-cat="tea" onclick="filterCat('tea',this)">
+        🍵 Tea <span class="tab-count" id="count-tea">0</span>
+      </button>
+      <button class="tab-btn" data-cat="pastries" onclick="filterCat('pastries',this)">
+        🥐 Pastries <span class="tab-count" id="count-pastries">0</span>
+      </button>
+      <button class="tab-btn" data-cat="sandwiches" onclick="filterCat('sandwiches',this)">
+        🥪 Sandwiches <span class="tab-count" id="count-sandwiches">0</span>
+      </button>
+      <button class="tab-btn" data-cat="sweets" onclick="filterCat('sweets',this)">
+        🍪 Sweets <span class="tab-count" id="count-sweets">0</span>
+      </button>
+    </div>
+
+    <!-- Grid -->
+    <div class="items-grid" id="items-grid">
+      <div class="empty-notice" style="grid-column:1/-1">
+        <div class="icon">☕</div><p>Loading menu…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Cart Overlay + Drawer ─────────────────────────────────────────────── -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<aside class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-footer" id="cart-footer">
+    <div class="cart-totals" id="cart-totals"></div>
+    <a href="/checkout.html" class="btn btn-gold btn-full btn-lg" id="checkout-btn" style="margin-top:4px;">
+      Checkout →
+    </a>
+  </div>
+</aside>
+
+<!-- ── Footer ───────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span>☕</span>
+      <span class="script">The Daily Drip</span>
+      <span style="margin-left:8px">· 123 Maple Street · © 2026</span>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a><a href="/menu.html">Menu</a><a href="/tracker.html">Track Order</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<script src="/js/cart.js"></script>
+<script>
+let allItems = [];
+let currentCat = 'all';
+
+const CAT_GRADIENTS = {
+  'hot-drinks':  'linear-gradient(150deg,#1A0600 0%,#7A3010 100%)',
+  'iced-drinks': 'linear-gradient(150deg,#081830 0%,#1A5080 100%)',
+  'tea':         'linear-gradient(150deg,#081A10 0%,#185830 100%)',
+  'pastries':    'linear-gradient(150deg,#2A1004 0%,#8A5010 100%)',
+  'sandwiches':  'linear-gradient(150deg,#1A1008 0%,#6A4018 100%)',
+  'sweets':      'linear-gradient(150deg,#1A0818 0%,#681848 100%)',
+};
+const CAT_LABELS = {
+  'hot-drinks':'Hot Drink','iced-drinks':'Iced Drink',
+  'tea':'Tea','pastries':'Pastry','sandwiches':'Sandwich','sweets':'Sweet'
+};
+const CAT_COUNT_IDS = { 'all':'count-all','hot-drinks':'count-hot','iced-drinks':'count-iced','tea':'count-tea','pastries':'count-pastries','sandwiches':'count-sandwiches','sweets':'count-sweets' };
+
+async function loadMenu() {
+  const res = await fetch('/api/menu');
+  allItems = await res.json();
+  updateCounts();
+  renderItems();
+}
+
+function updateCounts() {
+  const countMap = {};
+  for (const it of allItems) {
+    countMap[it.category] = (countMap[it.category] || 0) + 1;
+  }
+  document.getElementById('count-all').textContent = allItems.length;
+  for (const [cat, id] of Object.entries(CAT_COUNT_IDS)) {
+    if (cat !== 'all') {
+      const el = document.getElementById(id);
+      if (el) el.textContent = countMap[cat] || 0;
+    }
+  }
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderItems();
+}
+
+function renderItems() {
+  const filtered = currentCat === 'all' ? allItems : allItems.filter(i => i.category === currentCat);
+  const grid = document.getElementById('items-grid');
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-notice" style="grid-column:1/-1"><div class="icon">🫙</div><p>No items in this category.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <div class="item-card">
+      <div class="item-visual" style="background:${CAT_GRADIENTS[item.category] || CAT_GRADIENTS.sweets}">
+        <div class="item-cat-tag">${CAT_LABELS[item.category] || item.category}</div>
+        <div class="item-emoji-wrap">
+          <div class="item-ring-outer"></div>
+          <div class="item-ring-inner"></div>
+          <span class="item-emoji">${item.emoji}</span>
+        </div>
+      </div>
+      <div class="item-body">
+        <h4>${item.name}</h4>
+        <p class="item-desc">${item.description}</p>
+        <div class="item-foot">
+          <span class="item-price">$${item.price.toFixed(2)}</span>
+          <button class="btn-add" id="add-${item.id}"
+            onclick="handleAdd(${item.id},'${esc(item.name)}',${item.price},'${item.emoji}',this)">
+            + Add
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function esc(s) { return s.replace(/'/g,"\\'"); }
+
+function handleAdd(id, name, price, emoji, btn) {
+  Cart.add({ id, name, price, emoji });
+  showToast(`${emoji} ${name} added!`);
+  btn.textContent = '✓ Added'; btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ Add'; btn.classList.remove('added'); }, 1800);
+  renderCartDrawer();
+}
+
+// ── Cart Drawer ───────────────────────────────────────────────────────────
+function openCart() {
+  renderCartDrawer();
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCartDrawer() {
+  const items  = Cart.getItems();
+  const list   = document.getElementById('cart-items-list');
+  const totals = document.getElementById('cart-totals');
+  const ckBtn  = document.getElementById('checkout-btn');
+
+  if (!items.length) {
+    list.innerHTML = `<div class="cart-empty"><div class="empty-icon">☕</div><p>Your cart is empty.<br/>Add something delicious!</p></div>`;
+    totals.innerHTML = '';
+    ckBtn.style.opacity = '.45'; ckBtn.style.pointerEvents = 'none';
+    return;
+  }
+
+  ckBtn.style.opacity = ''; ckBtn.style.pointerEvents = '';
+
+  list.innerHTML = items.map(it => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${it.emoji}</div>
+      <div class="cart-item-info">
+        <div class="name">${it.name}</div>
+        <div class="price">$${(it.price * it.quantity).toFixed(2)}</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(${it.id},${it.quantity-1})">−</button>
+        <span class="qty-num">${it.quantity}</span>
+        <button class="qty-btn" onclick="changeQty(${it.id},${it.quantity+1})">+</button>
+      </div>
+    </div>
+  `).join('');
+
+  const sub = Cart.getSubtotal();
+  totals.innerHTML = `
+    <div class="cart-row"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="cart-row"><span>Tax (8%)</span><span>$${(sub*.08).toFixed(2)}</span></div>
+    <div class="cart-row total"><span>Total</span><span>$${(sub*1.08).toFixed(2)}</span></div>
+  `;
+}
+
+function changeQty(id, qty) { Cart.setQty(id, qty); renderCartDrawer(); }
+
+window.addEventListener('cart-updated', () => {
+  if (document.getElementById('cart-drawer').classList.contains('open')) renderCartDrawer();
+});
+
+loadMenu();
+</script>
+</body>
+</html>
